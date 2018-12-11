@@ -43,7 +43,6 @@ public class NPQueryMaker {
         String classQuery = createQueryNameList(idList);
         SqliteDBHandler finalDbHandler = new SqliteDBHandler();
         String query = "select structure_id, smile, superclass, class, subclass from structure where structure_id in (" + classQuery + ");";
-        System.out.println(query);
         Connection con = finalDbHandler.connect(url);
         ResultSet queryRS = finalDbHandler.runQuery(con, query);
         try {
@@ -95,7 +94,6 @@ public class NPQueryMaker {
             String superQuery = String.format("select %1$s from %2$s where %3$s = '", idCol,tblName,superCol);
             queryList.add(superQuery + NPClass + "';");
         }
-        System.out.println(queryList);
         return queryList;
     };
     /**
@@ -107,7 +105,6 @@ public class NPQueryMaker {
         ArrayList<String> npIdList = new ArrayList();
         SqliteDBHandler dbHandler = new SqliteDBHandler();
         for(String query:queryList){
-            System.out.println(query);
             Connection con = dbHandler.connect(url);
             ResultSet results =  dbHandler.runQuery(con, query);
             try {
