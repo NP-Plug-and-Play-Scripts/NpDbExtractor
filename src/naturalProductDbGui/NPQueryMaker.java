@@ -5,6 +5,7 @@
  */
 package naturalProductDbGui;
 
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -29,13 +30,15 @@ public class NPQueryMaker {
      * output that contains the NP-ID, SMILES, SUperClass, class and subClass.
      * @param selectedNpClasses a object list containing the selected Classes from the GUI
      * @param url
+     * @param dbInfo
      * @return an ArrayList containing the NP-ID, SMILES, SUperClass, class and subClass 
      */
-    public ArrayList<String> NPQueryMaker(Object[] selectedNpClasses, String url){
+    public ArrayList<String> NPQueryMaker(Object[] selectedNpClasses, String url, ArrayList<String> dbInfo){
         ArrayList<String> queryOutput = new ArrayList();
         String[] selectedClasses = Arrays.asList(selectedNpClasses).toArray(new String[selectedNpClasses.length]);
         inputSplitter(selectedClasses);
-        ArrayList<String> queryList = queryListMaker();
+        //creates a query list with the given dbInfo( 0 = tbl name, 1 = idColumn,2 = superclass column, 3 = class column, 4 = subclass column).
+        ArrayList<String> queryList = queryListMaker(dbInfo.get(0),dbInfo.get(1),dbInfo.get(2),dbInfo.get(3),dbInfo.get(4));
         ArrayList<String> idList = runQueryList(queryList, url);
         String classQuery = createQueryNameList(idList);
         SqliteDBHandler finalDbHandler = new SqliteDBHandler();
@@ -78,16 +81,19 @@ public class NPQueryMaker {
      * creats a list of queries based on the classes entered in the GUI
      * @return the List of queries.
      */
-    private ArrayList<String> queryListMaker(){
+    private ArrayList<String> queryListMaker(String tblName,String idCol,String superCol,String classCol,String subCol){
         ArrayList<String> queryList = new ArrayList();
         for(String NPClass:subClasses){
-            queryList.add("select structure_id from structure where subClass = '" + NPClass + "';");
+            String subQuery = String.format("select %1$s from %2$s where %3$s = '", idCol,tblName,subCol);
+            queryList.add(subQuery + NPClass + "';");
         }
         for(String NPClass:classes){
-            queryList.add("select structure_id from structure where Class = '" + NPClass + "';");
+            String classQuery = String.format("select %1$s from %2$s where %3$s = '", idCol,tblName,classCol);
+            queryList.add(classQuery + NPClass + "';");
         }
         for(String NPClass:superClasses){
-            queryList.add("select structure_id from structure where superClass = '" + NPClass + "';");
+            String superQuery = String.format("select %1$s from %2$s where %3$s = '", idCol,tblName,superCol);
+            queryList.add(superQuery + NPClass + "';");
         }
         System.out.println(queryList);
         return queryList;

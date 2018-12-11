@@ -40,6 +40,14 @@ public class NpDbGui extends javax.swing.JFrame {
     private ArrayList<String> classList;
     private ArrayList<String> subClassList;
     
+    //Names of the Table and columns of the db
+    private final String tableName = "structure"; 
+    private final String idColumn = "structure_id"; 
+    private final String smileColumn = "smile"; 
+    private final String classColumn = "class"; 
+    private final String superClassColumn = "superclass"; 
+    private final String subClassColumn = "subclass"; 
+    
     /**
      * Creates new form NewJFrame
      */
@@ -415,7 +423,7 @@ public class NpDbGui extends javax.swing.JFrame {
     }//GEN-LAST:event_saveFileActionPerformed
 
     private void saveFileMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_saveFileMouseClicked
-        System.out.println("EGELS!");
+
     }//GEN-LAST:event_saveFileMouseClicked
 
     private void removeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeActionPerformed
@@ -459,10 +467,11 @@ public class NpDbGui extends javax.swing.JFrame {
         if(dbFile.isFile()){
             if(dbPathField.getText().endsWith(".sqlite")){
                 Connection con = sqlHandler.connect(dbPathField.getText());
-                ResultSet rs = sqlHandler.runQuery(con, "select structure_id, smile, class, subclass,superclass from structure;");
+                String query = String.format("select %1$s, %2$s,%3$s, %4$s,%5$s from %6$s;",this.idColumn,this.smileColumn,this.superClassColumn,this.classColumn,this.subClassColumn,this.tableName);
+                ResultSet rs = sqlHandler.runQuery(con, query);
                 try {
                     if(rs.next()){
-                        this.superClassList = createClassComboBoxData("select distinct(superclass) from structure;");
+                        this.superClassList = createClassComboBoxData("select distinct(" + this.superClassColumn + ") from " + this.tableName + ";");
                         //changes the arraylist to a string array. the 0 indicates that it should be a string array.
                         String[] sortedSuperClassArray = superClassList.toArray(new String[superClassList.size()]);
                         //sort the array before adding it to the combobox
@@ -473,7 +482,7 @@ public class NpDbGui extends javax.swing.JFrame {
                         AutoCompleteDecorator.decorate(superClassSelect);
 
 
-                        this.classList = createClassComboBoxData("select distinct(class) from structure;");
+                        this.classList = createClassComboBoxData("select distinct(" + this.classColumn + ") from " + this.tableName + ";");
                         //changes the arraylist to a string array. the 0 indicates that it should be a string array.
                         String[] sortedClassArray = classList.toArray(new String[classList.size()]);
                         //sort the array before adding it to the combobox
@@ -484,7 +493,7 @@ public class NpDbGui extends javax.swing.JFrame {
 
                         AutoCompleteDecorator.decorate(classSelect);
 
-                        this.subClassList = createClassComboBoxData("select distinct(subclass) from structure;");
+                        this.subClassList = createClassComboBoxData("select distinct(" + this.subClassColumn + ") from " + this.tableName + ";");
                         //changes the arraylist to a string array. the 0 indicates that it should be a string array.
                         String[] sortedSubClassArray = subClassList.toArray(new String[subClassList.size()]);
                         //sort the array before adding it to the combobox
@@ -497,8 +506,8 @@ public class NpDbGui extends javax.swing.JFrame {
                         NpTree.setModel(npTreeModel);
                         startSearch.setEnabled(true);
                     }else {
-                        JOptionPane.showMessageDialog(null, "Database does not contain the correct columns!\nShould contain structure_id, smile, class, "
-                                + "subclass and superclass.", "DB Content Warning",JOptionPane.WARNING_MESSAGE);
+                        String dbErrorMessage = String.format("Database does not contain the correct columns!\nShould contain the columns %1$s, %2$s,%3$s, %4$s,%5$s and table name %6$s.",this.idColumn,this.smileColumn,this.superClassColumn,this.classColumn,this.subClassColumn,this.tableName);
+                        JOptionPane.showMessageDialog(null, dbErrorMessage, "DB Content Warning",JOptionPane.WARNING_MESSAGE);
                     }
                 } catch (SQLException ex) {
                     Logger.getLogger(NpDbGui.class.getName()).log(Level.SEVERE, null, ex);
@@ -558,7 +567,8 @@ public class NpDbGui extends javax.swing.JFrame {
             tblModel.removeRow(i);
         }
         NPQueryMaker test = new NPQueryMaker();
-        ArrayList<String> queryOutput = test.NPQueryMaker(model.toArray(),dbPathField.getText());
+        ArrayList<String> dbInfo = new ArrayList<>(Arrays.asList(this.tableName,this.idColumn,this.superClassColumn,this.classColumn,this.subClassColumn));
+        ArrayList<String> queryOutput = test.NPQueryMaker(model.toArray(),dbPathField.getText(),dbInfo);
         Object[] tableInput = queryOutput.toArray();
         for(String rowEntry: queryOutput){
             Object[] splittedEntry = rowEntry.split("\\|");
@@ -652,7 +662,8 @@ public class NpDbGui extends javax.swing.JFrame {
      * @return a filled model for the JTree
      */
     private DefaultTreeModel NpTreeMaker(){
-        ArrayList<NpDbEntry> npEntryList = npObjectListMaker("select superclass, class, subclass from structure group by subclass order by superclass,class,subclass;");
+        String objectQuery = String.format("select %1$s, %2$s, %3$s from %4$s group by %3$s order by %1$s,%2$s,%3$s;", this.superClassColumn,this.classColumn,this.subClassColumn,this.tableName);
+        ArrayList<NpDbEntry> npEntryList = npObjectListMaker(objectQuery);
         // new iterator that iterates over the npEntryList.
         Iterator npEntryListIter = npEntryList.iterator();
         //2 strings that will contain the previous SuperClass and Class
