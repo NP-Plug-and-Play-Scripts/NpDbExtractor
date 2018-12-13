@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Array;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -33,21 +34,21 @@ import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
  * @author ozing003
  */
 public class NpDbGui extends javax.swing.JFrame {
-    
+
     final DefaultListModel<String> model = new DefaultListModel<>();
     SqliteDBHandler sqlHandler = new SqliteDBHandler();
     private ArrayList<String> superClassList;
     private ArrayList<String> classList;
     private ArrayList<String> subClassList;
-    
+
     //Names of the Table and columns of the db
-    private final String tableName = "structure"; 
-    private final String idColumn = "structure_id"; 
-    private final String smileColumn = "smile"; 
-    private final String classColumn = "class"; 
-    private final String superClassColumn = "superclass"; 
-    private final String subClassColumn = "subclass"; 
-    
+    private final String tableName = "structure";
+    private final String idColumn = "structure_id";
+    private final String smileColumn = "smile";
+    private final String classColumn = "class";
+    private final String superClassColumn = "superclass";
+    private final String subClassColumn = "subclass";
+
     /**
      * Creates new form NewJFrame
      */
@@ -79,7 +80,7 @@ public class NpDbGui extends javax.swing.JFrame {
         dbResultsLabel = new javax.swing.JLabel();
         tablePane = new javax.swing.JScrollPane();
         dbResultsTable = new javax.swing.JTable();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
+        selectTabs = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         subClassAdd = new javax.swing.JButton();
         //Creates the superclass label, textfield and add buttons
@@ -254,10 +255,10 @@ public class NpDbGui extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(subClassSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(subClassAdd))
-                .addContainerGap(100, Short.MAX_VALUE))
+                .addContainerGap(143, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("tab1", jPanel1);
+        selectTabs.addTab("Dropdown Select", jPanel1);
 
         javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("root");
         NpTree.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
@@ -290,13 +291,13 @@ public class NpDbGui extends javax.swing.JFrame {
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 252, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(addSelectedClass, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("tab2", jPanel4);
+        selectTabs.addTab("Tree Select", jPanel4);
 
         startSearch.setEnabled(false);
         startSearch.setText("Search");
@@ -341,33 +342,39 @@ public class NpDbGui extends javax.swing.JFrame {
                     .addComponent(tablePane, javax.swing.GroupLayout.PREFERRED_SIZE, 561, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(remove, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(46, 46, 46)
-                                .addComponent(removeAll, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(dbPathField, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(browserButton))
-                            .addComponent(setDBLabel)
-                            .addComponent(setDB)
-                            .addComponent(selectedClassesLabel)
-                            .addComponent(selectedClassesPane)
-                            .addComponent(jTabbedPane1)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(118, 118, 118)
-                        .addComponent(startSearch)))
-                .addContainerGap(24, Short.MAX_VALUE))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(dbPathField, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(browserButton))
+                                    .addComponent(setDBLabel)
+                                    .addComponent(setDB)
+                                    .addComponent(selectedClassesLabel)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(118, 118, 118)
+                                .addComponent(startSearch)))
+                        .addGap(0, 15, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(remove, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(removeAll, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(selectedClassesPane, javax.swing.GroupLayout.PREFERRED_SIZE, 291, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(selectTabs, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(dbResultsLabel)
-                    .addComponent(setDBLabel))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(setDBLabel)
+                    .addComponent(dbResultsLabel, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
@@ -376,16 +383,16 @@ public class NpDbGui extends javax.swing.JFrame {
                             .addComponent(browserButton, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(setDB)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
                         .addComponent(selectedClassesLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(selectedClassesPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(remove)
                             .addComponent(removeAll))
                         .addGap(18, 18, 18)
-                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 315, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(selectTabs)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(startSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
@@ -396,18 +403,23 @@ public class NpDbGui extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    
+    /**
+     * saves data from the gui search (thats shown in the table to a csv file on the location selected by the user with the given name.
+     * @param evt 
+     */
     private void saveFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveFileActionPerformed
-        JFileChooser fc = new JFileChooser();   
+        JFileChooser fc = new JFileChooser();
         int returnVal = fc.showDialog(NpDbGui.this, "Attach");
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             OutputWriter writer = new OutputWriter();
             File file = fc.getSelectedFile();
-            writer.openFile(file);
-            DefaultTableModel tModel  = (DefaultTableModel) dbResultsTable.getModel();
+            writer.openCsvFile(file);
+            DefaultTableModel tModel = (DefaultTableModel) dbResultsTable.getModel();
             int lineCount = tModel.getRowCount();
-            for(int i=0; i < lineCount; i++){
-                String writeLine = tModel.getValueAt(i,0) + "," + tModel.getValueAt(i,1);
+            //loop through the table Model to enter all lines in to the opened file.
+            for (int i = 0; i < lineCount; i++) {
+                String writeLine = tModel.getValueAt(i, 0) + "," + tModel.getValueAt(i, 1);
                 try {
                     writer.writeLine(writeLine);
                 } catch (IOException ex) {
@@ -429,8 +441,9 @@ public class NpDbGui extends javax.swing.JFrame {
     private void removeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeActionPerformed
         ListSelectionModel selectionModel = selectedClassesList.getSelectionModel();
         int index = selectionModel.getMinSelectionIndex();
-        if (index >= 0)
-          this.model.remove(index);  
+        if (index >= 0) {
+            this.model.remove(index);
+        }
     }//GEN-LAST:event_removeActionPerformed
 
     private void classSelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_classSelectActionPerformed
@@ -443,7 +456,7 @@ public class NpDbGui extends javax.swing.JFrame {
 
     private void superClassSelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_superClassSelectActionPerformed
         // TODO add your handling code here:
-        
+
     }//GEN-LAST:event_superClassSelectActionPerformed
 
     private void classAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_classAddActionPerformed
@@ -463,14 +476,20 @@ public class NpDbGui extends javax.swing.JFrame {
     }//GEN-LAST:event_removeAllActionPerformed
 
     private void setDBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setDBActionPerformed
+        //arrayList of all the columns in the table
+        ArrayList<String> dbInfo = new ArrayList<>(Arrays.asList(this.idColumn,this.smileColumn, this.superClassColumn, this.classColumn, this.subClassColumn));
+        // makes a file out of the info in dbPathField
         File dbFile = new File(dbPathField.getText());
-        if(dbFile.isFile()){
-            if(dbPathField.getText().endsWith(".sqlite")){
+        //checks if the made file is actualy a existing file if not it throws an error message
+        if (dbFile.isFile()) {
+            //checks if the selected file ends with .sqlite if not it throws an error message.
+            if (dbPathField.getText().endsWith(".sqlite")) {
                 Connection con = sqlHandler.connect(dbPathField.getText());
-                String query = String.format("select %1$s, %2$s,%3$s, %4$s,%5$s from %6$s;",this.idColumn,this.smileColumn,this.superClassColumn,this.classColumn,this.subClassColumn,this.tableName);
-                ResultSet rs = sqlHandler.runQuery(con, query);
-                try {
-                    if(rs.next()){
+                //checks if the table name exists in the database if not it throws an error message.
+                if(checkDbTable(this.tableName, con)){
+                    //checks if all the required columns are present if not..... it throws an error message (im starting to see a pattern...)
+                    if(checkDbColumns(this.tableName, dbInfo, con)){
+                    //Fills all the comboBoxes with data
                         this.superClassList = createClassComboBoxData("select distinct(" + this.superClassColumn + ") from " + this.tableName + ";");
                         //changes the arraylist to a string array. the 0 indicates that it should be a string array.
                         String[] sortedSuperClassArray = superClassList.toArray(new String[superClassList.size()]);
@@ -479,6 +498,7 @@ public class NpDbGui extends javax.swing.JFrame {
                         for(String molSuperClass : sortedSuperClassArray){
                             superClassSelect.addItem(molSuperClass);
                         }
+                        //adds a decorator to the comboBox, this makes it so it auto completes when typing in them.
                         AutoCompleteDecorator.decorate(superClassSelect);
 
 
@@ -502,23 +522,35 @@ public class NpDbGui extends javax.swing.JFrame {
                             subClassSelect.addItem(molSubClass);
                         }
                         AutoCompleteDecorator.decorate(subClassSelect);
+                        //creates a tree model.
                         DefaultTreeModel npTreeModel = NpTreeMaker();
+                        //sets the obtained tree  model as the tree model in tab 2
                         NpTree.setModel(npTreeModel);
+                        //makes it so you can press the start search button.
                         startSearch.setEnabled(true);
-                    }else {
-                        String dbErrorMessage = String.format("Database does not contain the correct columns!\nShould contain the columns %1$s, %2$s,%3$s, %4$s,%5$s and table name %6$s.",this.idColumn,this.smileColumn,this.superClassColumn,this.classColumn,this.subClassColumn,this.tableName);
-                        JOptionPane.showMessageDialog(null, dbErrorMessage, "DB Content Warning",JOptionPane.WARNING_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Selected table " + this.tableName + " does not have the required columns: " 
+                                + this.idColumn + ", " + this.smileColumn + ", " + this.superClassColumn + ", " + this.classColumn + ", " + this.subClassColumn, 
+                                "Column(s) not Found Error", JOptionPane.ERROR_MESSAGE);
+                
                     }
+                } else{
+                    JOptionPane.showMessageDialog(null, "Selected DataBase does not contain the table " + this.tableName, "Table not Found Error", JOptionPane.ERROR_MESSAGE);
+                }
+                try {
+                    //closes the connection
+                    con.close();
                 } catch (SQLException ex) {
                     Logger.getLogger(NpDbGui.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                
             } else {
-                JOptionPane.showMessageDialog(null, "Selected File is not a .sqlite file!","Wrong File Type Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Selected File is not a .sqlite file!", "Wrong File Type Error", JOptionPane.ERROR_MESSAGE);
             }
-           
+
         } else {
-            JOptionPane.showMessageDialog(null, "Entered path does not lead to a existing file!\n","Not a File Error",JOptionPane.ERROR_MESSAGE);
-        } 
+            JOptionPane.showMessageDialog(null, "Entered path does not lead to a existing file!\n", "Not a File Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_setDBActionPerformed
 
     private void browserButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browserButtonActionPerformed
@@ -545,15 +577,15 @@ public class NpDbGui extends javax.swing.JFrame {
 
     private void addSelectedClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addSelectedClassActionPerformed
         String selectedNP = NpTree.getLastSelectedPathComponent().toString();
-        if(classList.contains(selectedNP)){
+        if (classList.contains(selectedNP)) {
             model.addElement("class|" + selectedNP);
-        } else if(superClassList.contains(selectedNP)){
+        } else if (superClassList.contains(selectedNP)) {
             model.addElement("super|" + selectedNP);
         } else {
             model.addElement("sub|" + selectedNP);
         }
-        
-        
+
+
     }//GEN-LAST:event_addSelectedClassActionPerformed
 
     private void NpTreeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_NpTreeValueChanged
@@ -567,10 +599,10 @@ public class NpDbGui extends javax.swing.JFrame {
             tblModel.removeRow(i);
         }
         NPQueryMaker test = new NPQueryMaker();
-        ArrayList<String> dbInfo = new ArrayList<>(Arrays.asList(this.tableName,this.idColumn,this.superClassColumn,this.classColumn,this.subClassColumn));
-        ArrayList<String> queryOutput = test.NPQueryMaker(model.toArray(),dbPathField.getText(),dbInfo);
+        ArrayList<String> dbInfo = new ArrayList<>(Arrays.asList(this.tableName, this.idColumn, this.superClassColumn, this.classColumn, this.subClassColumn));
+        ArrayList<String> queryOutput = test.NPQueryMaker(model.toArray(), dbPathField.getText(), dbInfo);
         Object[] tableInput = queryOutput.toArray();
-        for(String rowEntry: queryOutput){
+        for (String rowEntry : queryOutput) {
             Object[] splittedEntry = rowEntry.split("\\|");
             tblModel.addRow(splittedEntry);
         }
@@ -597,7 +629,7 @@ public class NpDbGui extends javax.swing.JFrame {
         }
         //</editor-fold>
         //</editor-fold>
-        
+
         //</editor-fold>
         //</editor-fold>
 
@@ -606,19 +638,23 @@ public class NpDbGui extends javax.swing.JFrame {
             new NpDbGui().setVisible(true);
         });
     }
+
     /**
-     * takes a query and turns it in to a result list containing the results of the query.
-     * used to fill the comboboxes with the classes superclasses and subclasses.
-     * @param query a query for the database in order to get a list of superclasses, classes, or subclasses
-     * @return a list of strings containing (sub/super)class names 
+     * takes a query and turns it in to a result list containing the results of
+     * the query. used to fill the comboboxes with the classes superclasses and
+     * subclasses.
+     *
+     * @param query a query for the database in order to get a list of
+     * superclasses, classes, or subclasses
+     * @return a list of strings containing (sub/super)class names
      */
-    private ArrayList createClassComboBoxData(String query){
+    private ArrayList createClassComboBoxData(String query) {
         ArrayList resultList = new ArrayList();
-        if(dbPathField.getText().isEmpty()){
+        if (dbPathField.getText().isEmpty()) {
             resultList.add("Noone");
         } else {
             Connection con = sqlHandler.connect(dbPathField.getText());
-            ResultSet results = sqlHandler.runQuery(con, query); 
+            ResultSet results = sqlHandler.runQuery(con, query);
             try {
                 while (results.next()) {
                     resultList.add(results.getString(1));
@@ -627,21 +663,23 @@ public class NpDbGui extends javax.swing.JFrame {
                 Logger.getLogger(NpDbGui.class.getName()).log(Level.SEVERE, null, ex);
             }
             sqlHandler.disconnect(con);
-             
+
         }
         return resultList;
     }
+
     /**
      * creates a list of NpDbEntries with the given DB query.
-     * @param query: query for the sqlite database 
+     *
+     * @param query: query for the sqlite database
      * @return a list of NpDbEntries.
      */
-    private ArrayList<NpDbEntry> npObjectListMaker(String query){
+    private ArrayList<NpDbEntry> npObjectListMaker(String query) {
         ArrayList<NpDbEntry> npObjectList = new ArrayList();
         //connects to the database
         Connection con = sqlHandler.connect(dbPathField.getText());
         //gets the results with the given query
-        ResultSet results = sqlHandler.runQuery(con, query); 
+        ResultSet results = sqlHandler.runQuery(con, query);
         try {
             //while theres still lines in the results
             while (results.next()) {
@@ -656,35 +694,39 @@ public class NpDbGui extends javax.swing.JFrame {
         //eturn the list of np objects.
         return npObjectList;
     }
+
     /**
-     * fills the JTree model in the gui with all the superclasses classes and sub classes. it does so by taking the superclasses,
-     * classes and subclasses from the database sorted on superclass class and finaly subclass. 
+     * fills the JTree model in the gui with all the superclasses classes and
+     * sub classes. it does so by taking the superclasses, classes and
+     * subclasses from the database sorted on superclass class and finaly
+     * subclass.
+     *
      * @return a filled model for the JTree
      */
-    private DefaultTreeModel NpTreeMaker(){
-        String objectQuery = String.format("select %1$s, %2$s, %3$s from %4$s group by %3$s order by %1$s,%2$s,%3$s;", this.superClassColumn,this.classColumn,this.subClassColumn,this.tableName);
+    private DefaultTreeModel NpTreeMaker() {
+        String objectQuery = String.format("select %1$s, %2$s, %3$s from %4$s group by %3$s order by %1$s,%2$s,%3$s;", this.superClassColumn, this.classColumn, this.subClassColumn, this.tableName);
         ArrayList<NpDbEntry> npEntryList = npObjectListMaker(objectQuery);
         // new iterator that iterates over the npEntryList.
         Iterator npEntryListIter = npEntryList.iterator();
         //2 strings that will contain the previous SuperClass and Class
         String prevSuperClass = "";
         String prevClass = "";
-        
+
         //new node the top which will be the root of the tree
         DefaultMutableTreeNode top = new DefaultMutableTreeNode("Natural Product DB");
         //another node this will be a superClass
         DefaultMutableTreeNode npSuperClass = null;
         // another one this will be a Class
-        DefaultMutableTreeNode npClass  = null;
+        DefaultMutableTreeNode npClass = null;
 
         //while the iterator still has another entry in the list.
         while (npEntryListIter.hasNext()) {
             //take next value as naturalProduct
             NpDbEntry naturalProduct = (NpDbEntry) npEntryListIter.next();
             //if the superclass name of naturalProduct does not equal the previous super class
-            if (!naturalProduct.getNpSuperClass().equals(prevSuperClass)) {                
+            if (!naturalProduct.getNpSuperClass().equals(prevSuperClass)) {
                 //if npSuperClass is not null (first superclass to enter will pass this)
-                if (npSuperClass != null) {  
+                if (npSuperClass != null) {
                     //add the npSuperClasss to root
                     top.add(npSuperClass);
                 }
@@ -695,9 +737,9 @@ public class NpDbGui extends javax.swing.JFrame {
 
             }
             //if name of the class does not equal the previous class
-            if (!naturalProduct.getNpClass().equals(prevClass)) {  
+            if (!naturalProduct.getNpClass().equals(prevClass)) {
                 //if npClass is not null (first class to enter will pass this)
-                if (npClass != null) {  
+                if (npClass != null) {
                     //add the previous NpClass to the superClass 
                     npSuperClass.add(npClass);
                 }
@@ -719,6 +761,55 @@ public class NpDbGui extends javax.swing.JFrame {
         return boompje;
     }
 
+    /**
+     * Checks if the database contains the table with the given table name.
+     *
+     * @param tableName tables name that should be seen
+     * @param con the connection to the db.
+     * @return a boolean telling if the table exists or not
+     */
+    private boolean checkDbTable(String tableName, Connection con) {
+        Boolean tableExists = false;
+        try {
+            DatabaseMetaData md = con.getMetaData();
+            ResultSet resultSet;
+            resultSet = md.getTables(null, null, tableName, null);
+            if (resultSet.next()) {
+                tableExists = true;
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(NpDbGui.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return tableExists;
+    }
+    /**
+     * Checks if the list of given columns are present in the given table. if they are returns true if not returns false.
+     * @param tableName name of the table
+     * @param columnList String array of column names
+     * @param con connection to the database.
+     * @return boolean true if all columns are present false if not all present.
+     */
+    private boolean checkDbColumns(String tableName, ArrayList<String> columnList, Connection con) {
+        Boolean columnsExist = false;
+        int columnsInDb = 0;
+        for (String columnName : columnList) {
+            try {
+                DatabaseMetaData md = con.getMetaData();
+                ResultSet resultSet;
+                resultSet = md.getColumns(null, null, tableName,columnName);
+                if (resultSet.next()) {
+                    columnsInDb++;
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(NpDbGui.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        if(columnsInDb == 5){
+            columnsExist = true;
+        }
+        return columnsExist;
+    }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTree NpTree;
@@ -735,10 +826,10 @@ public class NpDbGui extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JButton remove;
     private javax.swing.JButton removeAll;
     private javax.swing.JMenuItem saveFile;
+    private javax.swing.JTabbedPane selectTabs;
     private javax.swing.JLabel selectedClassesLabel;
     private javax.swing.JList<String> selectedClassesList;
     private javax.swing.JScrollPane selectedClassesPane;
@@ -754,5 +845,3 @@ public class NpDbGui extends javax.swing.JFrame {
     private javax.swing.JScrollPane tablePane;
     // End of variables declaration//GEN-END:variables
 }
-
-
